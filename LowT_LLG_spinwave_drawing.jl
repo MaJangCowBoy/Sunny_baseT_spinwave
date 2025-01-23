@@ -163,7 +163,8 @@ sys1 = nothing;  sys2 = nothing;
 # Q-grid is generated here.
 # Each data has different Q-grid.
 # =======================================
-qPathData02 = makeSweepPoints(path02,qPtN02,vs02,ws02,qWid02); # ? This is for new version of spaghetti plot
+qPathData02 = makeSweepPoints(path02,qPtN02,vs02,ws02,qWid02); 
+# ? This is for new version of spaghetti plot
 # ! # qPathData02 = makeSweepPath(crystl,path02,qGrd02,qItv02);
 # ! # --> this is for old version of spaghetti plot
 
@@ -185,32 +186,27 @@ formula2 = intensity_formula(DynaCorr2, :perp; formfactors = formfactors, kT = k
 Elist = available_energies(DynaCorr1); 
 
 SQWData02_1       = intensities_interpolated(DynaCorr1, qPathData02, formula1; interpolation = :linear)
-SQWData03040506_1 = intensities_interpolated(DynaCorr1, qGridData03, formula1; interpolation = :linear)
-SQWData07080910_1 = intensities_interpolated(DynaCorr1, qGridData07, formula1; interpolation = :linear)
-# SQWData09     = intensities_interpolated(DynaCorr, qGridData09, formula; interpolation = :linear)
-# SQWData10     = intensities_interpolated(DynaCorr, qGridData10, formula; interpolation = :linear)
 
 SQWData02_2       = intensities_interpolated(DynaCorr2, qPathData02, formula2; interpolation = :linear)
-SQWData03040506_2 = intensities_interpolated(DynaCorr2, qGridData03, formula2; interpolation = :linear)
-SQWData07080910_2 = intensities_interpolated(DynaCorr2, qGridData07, formula2; interpolation = :linear)
-# SQWData09     = intensities_interpolated(DynaCorr, qGridData09, formula; interpolation = :linear)
-# SQWData10     = intensities_interpolated(DynaCorr, qGridData10, formula; interpolation = :linear)
-
-println("")
-println(Dates.format(now(), "yy-mm-dd HH:MM"))
-println("Basic SQW calculation is done with param_id = $(idx)")
 
 if res_on == true # unfortunately, QE-broadening is not working well for spaghetti plot now.
-  br_SQWData02_1       = E_broadening(Elist, SQWData02_1,     dE_4SEASONS);
+  br_SQWData02_1 = E_broadening(Elist, SQWData02_1, dE_4SEASONS);
+  br_SQWData02_2 = E_broadening(Elist, SQWData02_2, dE_4SEASONS);
+end
+
+SQWData03040506_1 = intensities_interpolated(DynaCorr1, qGridData03, formula1; interpolation = :linear)
+SQWData07080910_1 = intensities_interpolated(DynaCorr1, qGridData07, formula1; interpolation = :linear)
+
+SQWData03040506_2 = intensities_interpolated(DynaCorr2, qGridData03, formula2; interpolation = :linear)
+SQWData07080910_2 = intensities_interpolated(DynaCorr2, qGridData07, formula2; interpolation = :linear)
+
+if res_on == true
   br_SQWData03040506_1 = QE_broaden_and_Sum(SQWData03040506_1, xGrd03, yGrd03, Elist, dE_4SEASONS, 0.0200, 0.0300; Qsc = 1.0);
   br_SQWData07080910_1 = QE_broaden_and_Sum(SQWData07080910_1, xGrd07, yGrd07, Elist, dE_4SEASONS, 0.0150, 0.0400; Qsc = 1.0);
-  # SQWData09     = QE_broaden_and_Sum(SQWData09,     xGrd09, yGrd09, Elist, dE_4SEASONS, 0.0150, 0.0750; Qsc = 1.0);
-  # SQWData10     = QE_broaden_and_Sum(SQWData10,     xGrd10, yGrd10, Elist, dE_4SEASONS, 0.0087, 0.0750; Qsc = 1.0);
-  br_SQWData02_2       = E_broadening(Elist, SQWData02_2,     dE_4SEASONS);
+
   br_SQWData03040506_2 = QE_broaden_and_Sum(SQWData03040506_2, xGrd03, yGrd03, Elist, dE_4SEASONS, 0.0200, 0.0300; Qsc = 1.0);
   br_SQWData07080910_2 = QE_broaden_and_Sum(SQWData07080910_2, xGrd07, yGrd07, Elist, dE_4SEASONS, 0.0150, 0.0400; Qsc = 1.0);
-  # SQWData09     = QE_broaden_and_Sum(SQWData09,     xGrd09, yGrd09, Elist, dE_4SEASONS, 0.0150, 0.0750; Qsc = 1.0);
-  # SQWData10     = QE_broaden_and_Sum(SQWData10,     xGrd10, yGrd10, Elist, dE_4SEASONS, 0.0087, 0.0750; Qsc = 1.0);  
+
   # (cf) Version 1 : I used following parameter for broadening.
   # 03-05 : 0.0150, 0.0400  # 06-08 : 0.0200, 0.0300
   # 09    : 0.0150, 0.0750  # 10    : 0.0087, 0.0750
@@ -219,11 +215,20 @@ if res_on == true # unfortunately, QE-broadening is not working well for spaghet
   # 09    : 0.0150, 0.0750  # 10    : 0.0087, 0.0750
 end
 
+println("")
+println(Dates.format(now(), "yy-mm-dd HH:MM"))
+println("Basic SQW calculation is done with param_id = $(idx)")
+
+# =======================================
+# Data is average into 1D or 2D data ...
+# =======================================
+
 FitData02_1 = Average_Out_Spectra(br_SQWData02_1, Elist, eBot02[:], eTop02[:]; type = "spaghettiPlot_v3"); 
 FitData02_2 = Average_Out_Spectra(br_SQWData02_2, Elist, eBot02[:], eTop02[:]; type = "spaghettiPlot_v3"); 
 # ? This is for new version of spaghetti plot
 # ! # FitData02 = Average_Out_Spectra(SQWData02,     Elist, eBot02[:], eTop02[:]; type = "spaghettiPlot");
 # ! # --> this is for old version of spaghetti plot
+FitData02 = (FitData02_1 + FitData02_2) / 2;
 
 FitData03_1 = Average_Out_Spectra(br_SQWData03040506_1, Elist, eSum03[1], eSum03[2]);
 FitData03_2 = Average_Out_Spectra(br_SQWData03040506_2, Elist, eSum03[1], eSum03[2]);
@@ -242,7 +247,6 @@ FitData09_2 = Average_Out_Spectra(br_SQWData07080910_2, Elist, eSum09[1], eSum09
 FitData10_1 = Average_Out_Spectra(br_SQWData07080910_1, Elist, eSum10[1], eSum10[2]);
 FitData10_2 = Average_Out_Spectra(br_SQWData07080910_2, Elist, eSum10[1], eSum10[2]);
 
-FitData02 = (FitData02_1 + FitData02_2) / 2;
 FitData03 = (FitData03_1 + FitData03_2) / 2;
 FitData04 = (FitData04_1 + FitData04_2) / 2;
 FitData05 = (FitData05_1 + FitData05_2) / 2;
@@ -256,69 +260,23 @@ println("")
 println(Dates.format(now(), "yy-mm-dd HH:MM"))
 println("(Q,E) broadening is done with param_id = $(idx)")
 
+# =======================================
+# Save data for the future use, plotting etc,
+# =======================================
+
 using HDF5 
 fname = "ordered_phase_scattering.h5"
 fid = h5open(fname, "w")
-write(fid, "FitData02", FitData02)
-write(fid, "FitData03", FitData03)
-write(fid, "FitData04", FitData04)
-write(fid, "FitData05", FitData05)
-write(fid, "FitData06", FitData06)
-# write(fid, "Data_000_3P5", FitData05)
-# write(fid, "Data_001_3P5", FitData08)
-# write(fid, "Data_H00_00L", FitData09)
-# write(fid, "Data_HH0_00L", FitData10)
+write(fid, "FitData02", FitData02);
+write(fid, "FitData03", FitData03);  write(fid, "FitData04", FitData04);  write(fid, "FitData05", FitData05);
+write(fid, "FitData06", FitData06);  write(fid, "FitData07", FitData07);  write(fid, "FitData08", FitData08);
 close(fid)
 
-fid = h5open(fname, "r")
-data1 = read(fid, "FitData03")
-data2 = read(fid, "Data_001_1P5")
-data_t = read(fid, "Data_H00_00L")
-data_s = read(fid, "Data_HH0_00L")
-close(fid)
+# ====================================================================================== #
+# =============== Remaining part would be unnecessary for current use ================== # 
+# ====================================================================================== # 
 
-# ==============================================================================
-# Gather the data which contains useful info.                                  |
-#  L = 0 cut. E = 1,2,3 ± 0.5 meV       | L = 1 cut. E = 1,2,3 ± 0.5 meV       |
-#  [ x 1-x 0 ], x =-0.50:0.01:0.50      | [ x  0  1 ], x = 0.00:0.01:1.00      |
-#  Qwindow, HK =   ±0.10 / L = 1 ± 0.10 | Qwindow, HK =   ±0.10 / L = 1 ± 0.10 |
-# ==============================================================================
-
-# xBas_L0 = [ 1.0 -1.0 0.0];  xGrd_L0 = -0.50:0.02:0.50; # x =  â - b̂ , 
-# yBas_L0 = [ 1.0  1.0 0.0];  ySum_L0 = [-0.10 +0.10];   # y =  â + b̂ , 
-# zBas_L0 = [ 0.0  0.0 1.0];  zSum_L0 = [-0.10 +0.10];   # z =  ĉ
-# HKL_L0  = [ 0.5  0.5 0.0];  # hat for reciprocal lattice vector
-# OneDimGrid_L_is_Zero = makeOneDimGrid(xBas_L0,xGrd_L0,yBas_L0,ySum_L0,zBas_L0,zSum_L0,HKL_L0);
-# SQWData_L_is_Zero    = intensities_interpolated(DynaCorr, OneDimGrid_L_is_Zero, formula; interpolation = :linear);
-# SQWData_L_is_Zero_Q  = Q_broadening(xGrd_L0, NaN, SQWData_L_is_Zero, 0.08, NaN; type = "1Dcut");
-# E_is_One_L_is_Zero   = Average_Out_Spectra(SQWData_L_is_Zero_Q, Elist, 0.5, 1.5; type = "1Dcut");
-# E_is_Two_L_is_Zero   = Average_Out_Spectra(SQWData_L_is_Zero_Q, Elist, 1.5, 2.5; type = "1Dcut");
-# E_is_Thr_L_is_Zero   = Average_Out_Spectra(SQWData_L_is_Zero_Q, Elist, 2.5, 3.5; type = "1Dcut");
-
-# xBas_L1 = [+1.0  0.0 0.0];  xGrd_L1 =  0.00:0.02:1.00; # x =  â
-# yBas_L1 = [-0.5  1.0 0.0];  ySum_L1 = [-0.10 +0.10];   # y = -0.5â + b̂
-# zBas_L1 = [ 0.0  0.0 1.0];  zSum_L1 = [-0.10 +0.10];   # z =  ĉ
-# HKL_L1  = [ 0.0  0.0 1.0];  # hat for reciprocal lattice vector
-# OneDimGrid_L_is_One  = makeOneDimGrid(xBas_L1,xGrd_L1,yBas_L1,ySum_L1,zBas_L1,zSum_L1,HKL_L1);
-# SQWData_L_is_One     = intensities_interpolated(DynaCorr, OneDimGrid_L_is_One, formula; interpolation = :linear);
-# SQWData_L_is_One_Q   = Q_broadening(xGrd_L1, NaN, SQWData_L_is_One, 0.06, NaN; type = "1Dcut");
-# E_is_One_L_is_One    = Average_Out_Spectra(SQWData_L_is_One_Q, Elist, 0.5, 1.5; type = "1Dcut");
-# E_is_Two_L_is_One    = Average_Out_Spectra(SQWData_L_is_One_Q, Elist, 1.5, 2.5; type = "1Dcut");
-# E_is_Thr_L_is_One    = Average_Out_Spectra(SQWData_L_is_One_Q, Elist, 2.5, 3.5; type = "1Dcut");
-
-# filename = @sprintf("Data_1Dsweep_%d.jld2",idx);
-# jldsave(filename; E_is_One_L_is_Zero, E_is_Two_L_is_Zero, E_is_Thr_L_is_Zero, 
-#                   E_is_One_L_is_One,  E_is_Two_L_is_One,  E_is_Thr_L_is_One);
-
-# VisualizeOneDimFit(xGrd_L0,xGrd_L1,
-#                    E_is_One_L_is_Zero,E_is_Two_L_is_Zero,E_is_Thr_L_is_Zero,
-#                    E_is_One_L_is_One, E_is_Two_L_is_One, E_is_Thr_L_is_One,
-#                    idx);
-
-# println("")
-# println(Dates.format(now(), "yy-mm-dd HH:MM"))
-# println("1D cut data is generated for param_id = $(idx)")
-
+"""
 # =======================================
 # Apply data coverage
 # =======================================
@@ -393,3 +351,4 @@ end
 open(DirOfJsonData*"loss_$idx.csv", "w") do file
   write(file, string(-χ²sum))
 end
+"""
