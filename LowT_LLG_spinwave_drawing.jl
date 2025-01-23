@@ -185,9 +185,9 @@ formula1 = intensity_formula(DynaCorr1, :perp; formfactors = formfactors, kT = k
 formula2 = intensity_formula(DynaCorr2, :perp; formfactors = formfactors, kT = kT);
 Elist = available_energies(DynaCorr1); 
 
-SQWData02_1       = intensities_interpolated(DynaCorr1, qPathData02, formula1; interpolation = :linear)
+SQWData02_1 = intensities_interpolated(DynaCorr1, qPathData02, formula1; interpolation = :linear)
 
-SQWData02_2       = intensities_interpolated(DynaCorr2, qPathData02, formula2; interpolation = :linear)
+SQWData02_2 = intensities_interpolated(DynaCorr2, qPathData02, formula2; interpolation = :linear)
 
 if res_on == true # unfortunately, QE-broadening is not working well for spaghetti plot now.
   br_SQWData02_1 = E_broadening(Elist, SQWData02_1, dE_4SEASONS);
