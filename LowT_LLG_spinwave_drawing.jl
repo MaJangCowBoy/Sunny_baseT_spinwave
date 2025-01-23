@@ -3,6 +3,7 @@ This code will calculate the goodness of fit.
 Each goodness of fit would be feedback into Bayesian optimization algorithm.
 * Originally written by: PJ Park
 * Modified by: WH Cho, Last modified, 2025-01-20
+* compatible with Sunny v0.5.11
 """
 
 # =======================================
