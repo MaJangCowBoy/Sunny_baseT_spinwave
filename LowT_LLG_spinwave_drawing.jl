@@ -10,6 +10,7 @@ Each goodness of fit would be feedback into Bayesian optimization algorithm.
 # =======================================
 using JSON: JSON
 using Dates, JLD2, Statistics, Printf, PythonPlot
+using ProgressBars
 using Sunny
 using  LinearAlgebra, Random, MATLAB, Interpolations
 include("model_CoTaS_5var.jl");
@@ -42,8 +43,9 @@ NameOfGridData = get(envVar,"NameOfGridData", "");
 NameOfResData  = get(envVar,"NameOfResData", "");
 
 # params = JSON.parsefile(DirOfBOdotJSON*"BO.json")
-# idx = get(params, "ID",    0);  J1  = get(params, "J1",  0.0);  j2  = get(params, "J2",  0.0);
-# jc1 = get(params, "Jc1", 0.0);  jc2 = get(params, "Jc2", 0.0);  j3  = get(params, "J3",  0.0);
+# idx = get(params, "ID",    0);  J1  = get(params, "J1",  0.0);  
+# j2  = get(params, "J2",  0.0);  jc1 = get(params, "Jc1", 0.0);
+# jc2 = get(params, "Jc2", 0.0);  j3  = get(params, "J3",  0.0);
 
 J1  =  1.10970389;
 j2  =  0.50299860;  J2  =  j2 * J1;
@@ -137,26 +139,20 @@ sys2, crystl = CoTaS_5var(dim, J1, j2, j3, jc1, jc2; rng);
 
 for x in axes(sys1.dipoles,1), y in axes(sys1.dipoles,2), z in axes(sys1.dipoles,3), b in axes(sys1.dipoles,4)
   idx = mod1(x,3);  idy = mod1(y,3);
-  sys1.dipoles[x,y,z,b] = sys_small.dipoles[idx,idy,1,b];
-end
-
-for x in axes(sys2.dipoles,1), y in axes(sys2.dipoles,2), z in axes(sys2.dipoles,3), b in axes(sys2.dipoles,4)
-  idx = mod1(x,3);  idy = mod1(y,3);
+  sys1.dipoles[x,y,z,b] = +1 * sys_small.dipoles[idx,idy,1,b];
   sys2.dipoles[x,y,z,b] = -1 * sys_small.dipoles[idx,idy,1,b];
-end
+end;  minimize_energy!(sys1);  minimize_energy!(sys2);
 
-minimize_energy!(sys1);  minimize_energy!(sys2);
-
-λ = 0.1;  dt = 0.02;  langevin = Langevin(dt; kT, λ);
+damping = 0.1;  dt = 0.02;  langevin = Langevin(dt; kT, damping);
 ntherm = 4000;  # randomize_spins!(sys);
 
-using ProgressBars
+
 for i in ProgressBar(1:ntherm)  step!(sys1, langevin);  step!(sys2, langevin);  end
 
 ωmax = 20.1;  Nω = 201;
-DynaCorr1 = dynamical_correlations(sys1; Δt=2*dt, nω=Nω, ωmax=ωmax, apply_g=true, process_trajectory=:symmetrize);
-DynaCorr2 = dynamical_correlations(sys2; Δt=2*dt, nω=Nω, ωmax=ωmax, apply_g=true, process_trajectory=:symmetrize);
-add_sample!(DynaCorr1, sys1);  add_sample!(DynaCorr2, sys2);
+sc1 = dynamical_correlations(sys1; dt=2*dt, nω=Nω, ωmax=ωmax, apply_g=true);
+sc2 = dynamical_correlations(sys2; dt=2*dt, nω=Nω, ωmax=ωmax, apply_g=true);
+add_sample!(sc1, sys1);  add_sample!(sc2, sys2);
 sys1 = nothing;  sys2 = nothing;
 
 # =======================================
@@ -168,44 +164,44 @@ qPathData02 = makeSweepPoints(path02,qPtN02,vs02,ws02,qWid02);
 # ! # qPathData02 = makeSweepPath(crystl,path02,qGrd02,qItv02);
 # ! # --> this is for old version of spaghetti plot
 
-qGridData03 = makeGridPoint(xBas03,yBas03,xGrd03,yGrd03,zBas03,zSum03,HKL03);
-qGridData04 = makeGridPoint(xBas04,yBas04,xGrd04,yGrd04,zBas04,zSum04,HKL04);
-qGridData05 = makeGridPoint(xBas05,yBas05,xGrd05,yGrd05,zBas05,zSum05,HKL05);
-qGridData06 = makeGridPoint(xBas06,yBas06,xGrd06,yGrd06,zBas06,zSum06,HKL06);
-qGridData07 = makeGridPoint(xBas07,yBas07,xGrd07,yGrd07,zBas07,zSum07,HKL07);
-qGridData08 = makeGridPoint(xBas08,yBas08,xGrd08,yGrd08,zBas08,zSum08,HKL08);
-qGridData09 = makeGridPoint(xBas09,yBas09,xGrd09,yGrd09,zBas09,zSum09,HKL09);
-qGridData10 = makeGridPoint(xBas10,yBas10,xGrd10,yGrd10,zBas10,zSum10,HKL10);
+qpts03 = makeGridPoint(xBas03,yBas03,xGrd03,yGrd03,zBas03,zSum03,HKL03);
+qpts04 = makeGridPoint(xBas04,yBas04,xGrd04,yGrd04,zBas04,zSum04,HKL04);
+qpts05 = makeGridPoint(xBas05,yBas05,xGrd05,yGrd05,zBas05,zSum05,HKL05);
+qpts06 = makeGridPoint(xBas06,yBas06,xGrd06,yGrd06,zBas06,zSum06,HKL06);
+qpts07 = makeGridPoint(xBas07,yBas07,xGrd07,yGrd07,zBas07,zSum07,HKL07);
+qpts08 = makeGridPoint(xBas08,yBas08,xGrd08,yGrd08,zBas08,zSum08,HKL08);
+qpts09 = makeGridPoint(xBas09,yBas09,xGrd09,yGrd09,zBas09,zSum09,HKL09);
+qpts10 = makeGridPoint(xBas10,yBas10,xGrd10,yGrd10,zBas10,zSum10,HKL10);
 
 # =======================================
 # Calculate scat. x-sec for each data
 # and apply (Q,E) resolution convolution
 # =======================================
-formula1 = intensity_formula(DynaCorr1, :perp; formfactors = formfactors, kT = kT);
-formula2 = intensity_formula(DynaCorr2, :perp; formfactors = formfactors, kT = kT);
-Elist = available_energies(DynaCorr1); 
+formula1 = intensity_formula(sc1, :perp; formfactors = formfactors, kT = kT);
+formula2 = intensity_formula(sc2, :perp; formfactors = formfactors, kT = kT);
+Elist = available_energies(sc1); 
 
-SQWData02_1 = intensities_interpolated(DynaCorr1, qPathData02, formula1; interpolation = :linear)
+sqw02_1 = intensities_interpolated(sc1, qPathData02, formula1; interpolation = :linear)
 
-SQWData02_2 = intensities_interpolated(DynaCorr2, qPathData02, formula2; interpolation = :linear)
+sqw02_2 = intensities_interpolated(sc2, qPathData02, formula2; interpolation = :linear)
 
 if res_on == true # unfortunately, QE-broadening is not working well for spaghetti plot now.
-  br_SQWData02_1 = E_broadening(Elist, SQWData02_1, dE_4SEASONS);
-  br_SQWData02_2 = E_broadening(Elist, SQWData02_2, dE_4SEASONS);
+  br_sqw02_1 = E_broadening(Elist[4:end], sqw02_1[:,:,:,4:end], dE_4SEASONS);
+  br_sqw02_2 = E_broadening(Elist[4:end], sqw02_2[:,:,:,4:end], dE_4SEASONS);
 end
 
-SQWData03040506_1 = intensities_interpolated(DynaCorr1, qGridData03, formula1; interpolation = :linear)
-SQWData07080910_1 = intensities_interpolated(DynaCorr1, qGridData07, formula1; interpolation = :linear)
+sqw03_06_1 = intensities_interpolated(sc1, qpts03, formula1; interpolation = :linear)
+sqw07_10_1 = intensities_interpolated(sc1, qpts07, formula1; interpolation = :linear)
 
-SQWData03040506_2 = intensities_interpolated(DynaCorr2, qGridData03, formula2; interpolation = :linear)
-SQWData07080910_2 = intensities_interpolated(DynaCorr2, qGridData07, formula2; interpolation = :linear)
+sqw03_06_2 = intensities_interpolated(sc2, qpts03, formula2; interpolation = :linear)
+sqw07_10_2 = intensities_interpolated(sc2, qpts07, formula2; interpolation = :linear)
 
 if res_on == true
-  br_SQWData03040506_1 = QE_broaden_and_Sum(SQWData03040506_1, xGrd03, yGrd03, Elist, dE_4SEASONS, 0.0200, 0.0300; Qsc = 1.0);
-  br_SQWData07080910_1 = QE_broaden_and_Sum(SQWData07080910_1, xGrd07, yGrd07, Elist, dE_4SEASONS, 0.0150, 0.0400; Qsc = 1.0);
+  br_sqw03_06_1 = QE_broaden_and_Sum(sqw03_06_1, xGrd03, yGrd03, Elist, dE_4SEASONS, 0.020, 0.030; Qsc = 1.0);
+  br_sqw07_10_1 = QE_broaden_and_Sum(sqw07_10_1, xGrd07, yGrd07, Elist, dE_4SEASONS, 0.015, 0.040; Qsc = 1.0);
 
-  br_SQWData03040506_2 = QE_broaden_and_Sum(SQWData03040506_2, xGrd03, yGrd03, Elist, dE_4SEASONS, 0.0200, 0.0300; Qsc = 1.0);
-  br_SQWData07080910_2 = QE_broaden_and_Sum(SQWData07080910_2, xGrd07, yGrd07, Elist, dE_4SEASONS, 0.0150, 0.0400; Qsc = 1.0);
+  br_sqw03_06_2 = QE_broaden_and_Sum(sqw03_06_2, xGrd03, yGrd03, Elist, dE_4SEASONS, 0.020, 0.030; Qsc = 1.0);
+  br_sqw07_10_2 = QE_broaden_and_Sum(sqw07_10_2, xGrd07, yGrd07, Elist, dE_4SEASONS, 0.015, 0.040; Qsc = 1.0);
 
   # (cf) Version 1 : I used following parameter for broadening.
   # 03-05 : 0.0150, 0.0400  # 06-08 : 0.0200, 0.0300
@@ -223,29 +219,30 @@ println("Basic SQW calculation is done with param_id = $(idx)")
 # Data is average into 1D or 2D data ...
 # =======================================
 
-FitData02_1 = Average_Out_Spectra(br_SQWData02_1, Elist, eBot02[:], eTop02[:]; type = "spaghettiPlot_v3"); 
-FitData02_2 = Average_Out_Spectra(br_SQWData02_2, Elist, eBot02[:], eTop02[:]; type = "spaghettiPlot_v3"); 
+eBot02 = 0.60:0.20:20.00;  eTop02 = 0.80:0.20:20.20;
+FitData02_1 = Average_Out_Spectra(br_sqw02_1, Elist[4:end], eBot02[:], eTop02[:]; type = "spaghettiPlot_v3"); 
+FitData02_2 = Average_Out_Spectra(br_sqw02_2, Elist[4:end], eBot02[:], eTop02[:]; type = "spaghettiPlot_v3"); 
 # ? This is for new version of spaghetti plot
-# ! # FitData02 = Average_Out_Spectra(SQWData02,     Elist, eBot02[:], eTop02[:]; type = "spaghettiPlot");
+# ! # FitData02 = Average_Out_Spectra(sqw02,     Elist, eBot02[:], eTop02[:]; type = "spaghettiPlot");
 # ! # --> this is for old version of spaghetti plot
 FitData02 = (FitData02_1 + FitData02_2) / 2;
 
-FitData03_1 = Average_Out_Spectra(br_SQWData03040506_1, Elist, eSum03[1], eSum03[2]);
-FitData03_2 = Average_Out_Spectra(br_SQWData03040506_2, Elist, eSum03[1], eSum03[2]);
-FitData04_1 = Average_Out_Spectra(br_SQWData03040506_1, Elist, eSum04[1], eSum04[2]);
-FitData04_2 = Average_Out_Spectra(br_SQWData03040506_2, Elist, eSum04[1], eSum04[2]);
-FitData05_1 = Average_Out_Spectra(br_SQWData03040506_1, Elist, eSum05[1], eSum05[2]);
-FitData05_2 = Average_Out_Spectra(br_SQWData03040506_2, Elist, eSum05[1], eSum05[2]);
-FitData06_1 = Average_Out_Spectra(br_SQWData03040506_1, Elist, eSum06[1], eSum06[2]);
-FitData06_2 = Average_Out_Spectra(br_SQWData03040506_2, Elist, eSum06[1], eSum06[2]);
-FitData07_1 = Average_Out_Spectra(br_SQWData07080910_1, Elist, eSum07[1], eSum07[2]);
-FitData07_2 = Average_Out_Spectra(br_SQWData07080910_2, Elist, eSum07[1], eSum07[2]);
-FitData08_1 = Average_Out_Spectra(br_SQWData07080910_1, Elist, eSum08[1], eSum08[2]);
-FitData08_2 = Average_Out_Spectra(br_SQWData07080910_2, Elist, eSum08[1], eSum08[2]);
-FitData09_1 = Average_Out_Spectra(br_SQWData07080910_1, Elist, eSum09[1], eSum09[2]);
-FitData09_2 = Average_Out_Spectra(br_SQWData07080910_2, Elist, eSum09[1], eSum09[2]);
-FitData10_1 = Average_Out_Spectra(br_SQWData07080910_1, Elist, eSum10[1], eSum10[2]);
-FitData10_2 = Average_Out_Spectra(br_SQWData07080910_2, Elist, eSum10[1], eSum10[2]);
+FitData03_1 = Average_Out_Spectra(br_sqw03_06_1, Elist, eSum03[1], eSum03[2]);
+FitData03_2 = Average_Out_Spectra(br_sqw03_06_2, Elist, eSum03[1], eSum03[2]);
+FitData04_1 = Average_Out_Spectra(br_sqw03_06_1, Elist, eSum04[1], eSum04[2]);
+FitData04_2 = Average_Out_Spectra(br_sqw03_06_2, Elist, eSum04[1], eSum04[2]);
+FitData05_1 = Average_Out_Spectra(br_sqw03_06_1, Elist, eSum05[1], eSum05[2]);
+FitData05_2 = Average_Out_Spectra(br_sqw03_06_2, Elist, eSum05[1], eSum05[2]);
+FitData06_1 = Average_Out_Spectra(br_sqw03_06_1, Elist, eSum06[1], eSum06[2]);
+FitData06_2 = Average_Out_Spectra(br_sqw03_06_2, Elist, eSum06[1], eSum06[2]);
+FitData07_1 = Average_Out_Spectra(br_sqw07_10_1, Elist, eSum07[1], eSum07[2]);
+FitData07_2 = Average_Out_Spectra(br_sqw07_10_2, Elist, eSum07[1], eSum07[2]);
+FitData08_1 = Average_Out_Spectra(br_sqw07_10_1, Elist, eSum08[1], eSum08[2]);
+FitData08_2 = Average_Out_Spectra(br_sqw07_10_2, Elist, eSum08[1], eSum08[2]);
+FitData09_1 = Average_Out_Spectra(br_sqw07_10_1, Elist, eSum09[1], eSum09[2]);
+FitData09_2 = Average_Out_Spectra(br_sqw07_10_2, Elist, eSum09[1], eSum09[2]);
+FitData10_1 = Average_Out_Spectra(br_sqw07_10_1, Elist, eSum10[1], eSum10[2]);
+FitData10_2 = Average_Out_Spectra(br_sqw07_10_2, Elist, eSum10[1], eSum10[2]);
 
 FitData03 = (FitData03_1 + FitData03_2) / 2;
 FitData04 = (FitData04_1 + FitData04_2) / 2;
