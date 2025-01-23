@@ -1,0 +1,33 @@
+{
+  "J1min"  :  1.1,  "J1max"  :  1.6,
+  "J2min"  :  0.5,  "J2max"  :  0.7,
+  "J3min"  : -0.1,  "J3max"  :  0.3,
+  "Jc1min" :  1.0,  "Jc1max" :  1.4,
+  "Jc2min" : -0.3,  "Jc2max" :  0.0,
+
+  "margin" : 0.1,
+
+  "DirOfJuliaFile": "./",
+  "DirOfBOdotJSON": "./",
+  "DirOfExpData"  : "./",
+  "DirOfGridData" : "./",
+  "DirOfResData"  : "./",
+  "DirOfJsonData" : "./",
+
+
+  "JULIA_FILE_A"  : "CoTaS_highT_BOpt_J1J2J3Jc1Jc2.jl",
+  "JULIA_FILE_B"  : "MagStr_weighting_J1J2J3Jc1Jc2.jl",
+  "JULIA_FILE_C"  : "read_table_and_calc_Qvec.jl",
+  "NameOfExpData" : "ExpDataSet.mat",
+  "NameOfResData" : "ResDataSet.mat",
+  "NameOfGridData": "ExpGridSet.mat",
+
+  "PYTHON_FILE_A" : "POSTPROCESS_DATA.py",
+
+  "weight_on": 0,
+  "res_on": 1,
+  "const_on": 1,
+  "vis_on": 1
+
+}
+      
