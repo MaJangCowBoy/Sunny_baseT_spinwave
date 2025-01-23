@@ -265,6 +265,7 @@ println("(Q,E) broadening is done with param_id = $(idx)")
 using HDF5 
 fname = "ordered_phase_scattering.h5"
 fid = h5open(fname, "w")
+write(fid,"J1", J1);  write(fid,"j2", j2);  write(fid,"j3", j3);  write(fid,"jc1", jc1);  write(fid,"jc2", jc2);
 write(fid, "FitData02", FitData02);
 write(fid, "FitData03", FitData03);  write(fid, "FitData04", FitData04);  write(fid, "FitData05", FitData05);
 write(fid, "FitData06", FitData06);  write(fid, "FitData07", FitData07);  write(fid, "FitData08", FitData08);
