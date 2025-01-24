@@ -114,15 +114,15 @@ end
 #
 
 #
-sqw07_10_1 = zeros(size(qpts03,1), size(qpts03,2), size(qpts03,3), length(Elist));
-sqw07_10_2 = zeros(size(qpts03,1), size(qpts03,2), size(qpts03,3), length(Elist));
+sqw07_10_1 = zeros(size(qpts07,1), size(qpts07,2), size(qpts07,3), length(Elist));
+sqw07_10_2 = zeros(size(qpts07,1), size(qpts07,2), size(qpts07,3), length(Elist));
 
 Threads.@threads for n in 1:npar
-  idx_stt = Int64(1 + (n-1) * round(size(qpts03,1)/npar))
-  idx_end = Int64(n * round(size(qpts03,1)/npar))
-  if n == npar  idx_end = size(qpts03,1);  end
+  idx_stt = Int64(1 + (n-1) * round(size(qpts07,1)/npar))
+  idx_end = Int64(n * round(size(qpts07,1)/npar))
+  if n == npar  idx_end = size(qpts07,1);  end
   
-  q_tmp = qpts03[idx_stt:idx_end,:,:];
+  q_tmp = qpts07[idx_stt:idx_end,:,:];
   sqw_tmp_1 = intensities_interpolated(scs[1], q_tmp, formula1; interpolation = :linear);
   sqw07_10_1[idx_stt:idx_end,:,:,:] = sqw_tmp_1;
   sqw_tmp_2 = intensities_interpolated(scs[2], q_tmp, formula2; interpolation = :linear);
