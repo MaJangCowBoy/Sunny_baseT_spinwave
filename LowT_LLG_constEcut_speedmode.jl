@@ -27,12 +27,12 @@ include("Ei_dE.jl");  # Data extracted from Ei = 20 meV / Chopper = 150 Hz / Sam
 Ei = Ei[:];  dE = dE[:];  dE_4SEASONS = linear_interpolation(Ei, dE; extrapolation_bc=Line());
 
 xGrd03 = xGrd03[51:151];  xGrd03 = reshape(xGrd03,(1,101));
-yGrd03 = yGrd03[51:151];  yGrd03 = reshape(yGrd03,(1,101));
+yGrd03 = yGrd03[101:201];  yGrd03 = reshape(yGrd03,(1,101));
 qpts03_1 = makeGridPoint(xBas03,yBas03,xGrd03,yGrd03,zBas03,zSum03,HKL03);
 qpts03_2 = makeGridPoint(xBas03,yBas03,xGrd03,yGrd03,zBas03,zSum03,HKL03);
 
 xGrd07 = xGrd07[51:151];  xGrd03 = reshape(xGrd07,(1,101));
-yGrd07 = yGrd07[51:151];  yGrd03 = reshape(yGrd07,(1,101));
+yGrd07 = yGrd07[101:201];  yGrd03 = reshape(yGrd07,(1,101));
 qpts07_1 = makeGridPoint(xBas07,yBas07,xGrd07,yGrd07,zBas07,zSum07,HKL07);
 qpts07_2 = makeGridPoint(xBas03,yBas03,xGrd03,yGrd03,zBas03,zSum03,HKL03);
 
