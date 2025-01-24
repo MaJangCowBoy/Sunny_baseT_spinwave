@@ -136,11 +136,11 @@ if res_on == true # unfortunately, QE-broadening is not working well for spaghet
 end
 
 if res_on == true
-  br_sqw03_06_1 = QE_broaden_and_Sum(sqw03_06_1, xGrd03, yGrd03, Elist, dE_4SEASONS, 0.020, 0.030; Qsc = 1.0);
-  br_sqw07_10_1 = QE_broaden_and_Sum(sqw07_10_1, xGrd07, yGrd07, Elist, dE_4SEASONS, 0.015, 0.040; Qsc = 1.0);
+  br_sqw03_06_1 = QE_broaden_and_Sum(sqw03_06_1[:,:,:,1:30], xGrd03, yGrd03, Elist[1:30], dE_4SEASONS, 0.020, 0.030; Qsc = 1.0);
+  br_sqw07_10_1 = QE_broaden_and_Sum(sqw07_10_1[:,:,:,1:30], xGrd07, yGrd07, Elist[1:30], dE_4SEASONS, 0.015, 0.040; Qsc = 1.0);
 
-  br_sqw03_06_2 = QE_broaden_and_Sum(sqw03_06_2, xGrd03, yGrd03, Elist, dE_4SEASONS, 0.020, 0.030; Qsc = 1.0);
-  br_sqw07_10_2 = QE_broaden_and_Sum(sqw07_10_2, xGrd07, yGrd07, Elist, dE_4SEASONS, 0.015, 0.040; Qsc = 1.0);
+  br_sqw03_06_2 = QE_broaden_and_Sum(sqw03_06_2[:,:,:,1:30], xGrd03, yGrd03, Elist[1:30], dE_4SEASONS, 0.020, 0.030; Qsc = 1.0);
+  br_sqw07_10_2 = QE_broaden_and_Sum(sqw07_10_2[:,:,:,1:30], xGrd07, yGrd07, Elist[1:30], dE_4SEASONS, 0.015, 0.040; Qsc = 1.0);
 
   # (cf) Version 1 : I used following parameter for broadening.
   # 03-05 : 0.0150, 0.0400  # 06-08 : 0.0200, 0.0300
