@@ -78,6 +78,23 @@ sc2 = dynamical_correlations(sys2; dt=2*dt, nω=Nω, ωmax=ωmax, apply_g=true);
 add_sample!(sc1, sys1);  add_sample!(sc2, sys2);
 # sys1 = nothing;  sys2 = nothing;
 
+#?
+systems1 = [ sys1 for id in 1:npar];  scs1 = [dynamical_correlations(sys1; dt=2*dt, nω, ωmax) for _ in 1:npar]
+systems2 = [ sys2 for id in 1:npar];  scs2 = [dynamical_correlations(sys2; dt=2*dt, nω, ωmax) for _ in 1:npar]
+
+Threads.@threads for id in 1:npar
+  integrator = Langevin(dt; damping, kT)
+  for _ in 1:5000  step!(systems[id], integrator)  end
+  for _ in 1:2
+    for _ in 1:1000  step!(systems[id], integrator)  end
+    add_sample!(scs[id], systems[id])
+  end
+end
+
+sc1 = merge_correlations(scs1);  sc2 = merge_correlations(scs2);
+sc  = merge_correlations([sc1, sc2])
+#?
+
 # =======================================
 # Calculate scat. x-sec for each data
 # and apply (Q,E) resolution convolution
@@ -88,12 +105,16 @@ formula2 = intensity_formula(sc2, :perp; formfactors = formfactors, kT = kT);
 Elist = available_energies(sc1); 
 
 sqw02_1 = intensities_interpolated(sc1, qPathData02, formula1; interpolation = :linear)
-
 sqw02_2 = intensities_interpolated(sc2, qPathData02, formula2; interpolation = :linear)
+#?
+sqw02   = intensities_interpolated(sc1, qPathData02, formula1; interpolation = :linear)
+#?
+
 
 if res_on == true # unfortunately, QE-broadening is not working well for spaghetti plot now.
   br_sqw02_1 = E_broadening(Elist[4:end], sqw02_1[:,:,:,4:end], dE_4SEASONS);
   br_sqw02_2 = E_broadening(Elist[4:end], sqw02_2[:,:,:,4:end], dE_4SEASONS);
+  br_sqw02   = E_broadening(Elist[4:end], sqw02[:,:,:,4:end], dE_4SEASONS);
 end
 
 # =======================================
@@ -107,6 +128,8 @@ FitData02_2 = Average_Out_Spectra(br_sqw02_2, Elist[4:end], eBot02[:], eTop02[:]
 # ! # FitData02 = Average_Out_Spectra(sqw02,     Elist, eBot02[:], eTop02[:]; type = "spaghettiPlot");
 # ! # --> this is for old version of spaghetti plot
 FitData02 = (FitData02_1 + FitData02_2) / 2;
+
+FitData02   = Average_Out_Spectra(br_sqw02, Elist[4:end], eBot02[:], eTop02[:]; type = "spaghettiPlot_v3"); 
 
 # =======================================
 # Save data for the future use, plotting etc,
