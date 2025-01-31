@@ -27,6 +27,18 @@ j3_ideal   = 0.5 * (1 - (vA*vB-0.5*vA*vC+2*vB*vC)/sqrt(vA*vA-2*vA*vB+4*vB*vB) );
 include("Ei_dE.jl");  # Data extracted from Ei = 20 meV / Chopper = 150 Hz / Sample size = 80 mm
 Ei = Ei[:];  dE = dE[:];  dE_4SEASONS = linear_interpolation(Ei, dE; extrapolation_bc=Line());
 
+# =======================================
+# Define spaghetti plot path
+# =======================================
+NameOfExpData  = get(envVar,"NameOfExpData", "");
+NameOfGridData = get(envVar,"NameOfGridData", "");
+NameOfResData  = get(envVar,"NameOfResData", "");
+
+AbsGridData = MatFile(DirOfGridData*NameOfGridData);
+path02, qGrd02, qItv02, qPtN02, eBot02, eTop02, us02, vs02, ws02, qWid02 = 
+  loadGridData(AbsGridData,"02"; type = "spaghettiPlot_v3");
+
+qPathData02 = makeSweepPoints(path02,qPtN02,vs02,ws02,qWid02);
 
 # =======================================
 # Main loop for the calculation
