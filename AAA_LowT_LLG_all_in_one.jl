@@ -3,7 +3,7 @@
 # =======================================
 using JSON: JSON
 using Dates, JLD2, Statistics, Printf, PythonPlot
-using ProgressBars
+using ProgressBars, Rotations
 using Sunny
 using  LinearAlgebra, Random, MAT, Interpolations
 include("model_CoTaS_5var.jl");
@@ -13,6 +13,7 @@ include("funcBroadening.jl");
 include("funcFitSpectrum.jl");
 include("funcVisualize.jl");
 include("define_variables.jl");
+include("function_bundle.jl");
 
 J1  = 1.3110; # 1.1955542291322174;
 j2  = 0.3500; # 0.3002342874679325;  
@@ -37,7 +38,8 @@ Tpara = 3;  kT = Tpara * Sunny.meV_per_K;
 formfactors = [FormFactor("Co2"; g_lande = 2)];
 
 dim_small = (3,3,1);  sys_small, crystl = CoTaS_5var(dim_small, J1, j2, j3, jc1, jc2; rng);
-randomize_spins!(sys_small);  for _ in 1:10  minimize_energy!(sys_small; maxiters = 3000);  end
+sys_small = system_initialize(sys_small, "3Q", J1);
+# randomize_spins!(sys_small);  for _ in 1:10  minimize_energy!(sys_small; maxiters = 3000);  end
 print_wrapped_intensities(sys_small)
 
 dim = (30, 30, 2);
