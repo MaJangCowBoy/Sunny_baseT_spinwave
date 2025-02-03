@@ -1,4 +1,5 @@
-using MATLAB, JSON: JSON
+using MAT
+using JSON: JSON
 
 if isdir("FitCheck") == false  mkdir("FitCheck");  end
 
@@ -28,39 +29,39 @@ NameOfResData  = get(envVar,"NameOfResData", "");
 # =======================================
 # Experimental data is loaded here.
 # =======================================
-AbsExpData  = MatFile(DirOfExpData*NameOfExpData);
-AbsGridData = MatFile(DirOfGridData*NameOfGridData);
-AbsResData  = MatFile(DirOfResData*NameOfResData);
+AbsExpData  = matopen(DirOfExpData*NameOfExpData);
+AbsGridData = matopen(DirOfGridData*NameOfGridData);
+AbsResData  = matopen(DirOfResData*NameOfResData);
 
-ExpData02 = get_variable(AbsExpData, "ExpData02");
+ExpData02 = read(AbsExpData, "ExpData02");
 path02, qGrd02, qItv02, qPtN02, eBot02, eTop02, us02, vs02, ws02, qWid02 = 
   loadGridData(AbsGridData,"02"; type = "spaghettiPlot_v3");
 
 # ! # path02, qGrd02, qItv02, eBot02, eTop02 = loadGridData(AbsGridData,"02"; type = "spaghettiPlot");
 # ! # --> this is for old version of spaghetti plot
 
-ExpData03 = get_variable(AbsExpData, "ExpData03");
+ExpData03 = read(AbsExpData, "ExpData03");
 xBas03, yBas03, zBas03, xGrd03, yGrd03, zSum03, eSum03, HKL03 = loadGridData(AbsGridData,"03");
 
-ExpData04 = get_variable(AbsExpData, "ExpData04");
+ExpData04 = read(AbsExpData, "ExpData04");
 xBas04, yBas04, zBas04, xGrd04, yGrd04, zSum04, eSum04, HKL04 = loadGridData(AbsGridData,"04");
 
-ExpData05 = get_variable(AbsExpData, "ExpData05");
+ExpData05 = read(AbsExpData, "ExpData05");
 xBas05, yBas05, zBas05, xGrd05, yGrd05, zSum05, eSum05, HKL05 = loadGridData(AbsGridData,"05");
 
-ExpData06 = get_variable(AbsExpData, "ExpData06");
+ExpData06 = read(AbsExpData, "ExpData06");
 xBas06, yBas06, zBas06, xGrd06, yGrd06, zSum06, eSum06, HKL06 = loadGridData(AbsGridData,"06");
 
-ExpData07 = get_variable(AbsExpData, "ExpData07");
+ExpData07 = read(AbsExpData, "ExpData07");
 xBas07, yBas07, zBas07, xGrd07, yGrd07, zSum07, eSum07, HKL07 = loadGridData(AbsGridData,"07");
 
-ExpData08 = get_variable(AbsExpData, "ExpData08");
+ExpData08 = read(AbsExpData, "ExpData08");
 xBas08, yBas08, zBas08, xGrd08, yGrd08, zSum08, eSum08, HKL08 = loadGridData(AbsGridData,"08");
 
-ExpData09 = get_variable(AbsExpData, "ExpData09");
+ExpData09 = read(AbsExpData, "ExpData09");
 xBas09, yBas09, zBas09, xGrd09, yGrd09, zSum09, eSum09, HKL09 = loadGridData(AbsGridData,"09");
 
-ExpData10 = get_variable(AbsExpData, "ExpData10");
+ExpData10 = read(AbsExpData, "ExpData10");
 xBas10, yBas10, zBas10, xGrd10, yGrd10, zSum10, eSum10, HKL10 = loadGridData(AbsGridData,"10");
 
 # =======================================

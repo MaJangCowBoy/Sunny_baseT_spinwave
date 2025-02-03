@@ -1,37 +1,37 @@
 function loadGridData(MatFile,idx; type = "constEcut")
   if type == "spaghettiPlot"
 
-    path = get_variable(MatFile, "paths"*idx);
-    qGrd = get_variable(MatFile, "qGrid"*idx);
-    qItv = get_variable(MatFile, "qItvl"*idx);
-    eBot = get_variable(MatFile, "eBots"*idx);
-    eTop = get_variable(MatFile, "eTops"*idx);
+    path = read(MatFile, "paths"*idx);
+    qGrd = read(MatFile, "qGrid"*idx);
+    qItv = read(MatFile, "qItvl"*idx);
+    eBot = read(MatFile, "eBots"*idx);
+    eTop = read(MatFile, "eTops"*idx);
     return path, qGrd, qItv, eBot, eTop;
   
   elseif type == "spaghettiPlot_v3"
 
-    path = get_variable(MatFile, "paths"*idx);
-    qGrd = get_variable(MatFile, "qGrid"*idx);
-    qItv = get_variable(MatFile, "qItvl"*idx);
-    eBot = get_variable(MatFile, "eBots"*idx);
-    eTop = get_variable(MatFile, "eTops"*idx);
-    qPtN = get_variable(MatFile, "qPtsN"*idx);
-    us   = get_variable(MatFile, "us"*idx);
-    vs   = get_variable(MatFile, "vs"*idx);
-    ws   = get_variable(MatFile, "ws"*idx);
-    qWid = get_variable(MatFile, "qWid"*idx);
+    path = read(MatFile, "paths"*idx);
+    qGrd = read(MatFile, "qGrid"*idx);
+    qItv = read(MatFile, "qItvl"*idx);
+    eBot = read(MatFile, "eBots"*idx);
+    eTop = read(MatFile, "eTops"*idx);
+    qPtN = read(MatFile, "qPtsN"*idx);
+    us   = read(MatFile, "us"*idx);
+    vs   = read(MatFile, "vs"*idx);
+    ws   = read(MatFile, "ws"*idx);
+    qWid = read(MatFile, "qWid"*idx);
     return path, qGrd, qItv, qPtN, eBot, eTop, us, vs, ws, qWid;
 
   elseif type == "constEcut"
 
-    xBas = get_variable(MatFile, "xBasis"*idx);
-    yBas = get_variable(MatFile, "yBasis"*idx);
-    zBas = get_variable(MatFile, "zBasis"*idx);
-    xGrd = get_variable(MatFile, "xGrids"*idx);
-    yGrd = get_variable(MatFile, "yGrids"*idx);
-    zSum = get_variable(MatFile,   "zSum"*idx);
-    eSum = get_variable(MatFile,   "eSum"*idx);
-    HKL  = get_variable(MatFile,    "HKL"*idx);
+    xBas = read(MatFile, "xBasis"*idx);
+    yBas = read(MatFile, "yBasis"*idx);
+    zBas = read(MatFile, "zBasis"*idx);
+    xGrd = read(MatFile, "xGrids"*idx);
+    yGrd = read(MatFile, "yGrids"*idx);
+    zSum = read(MatFile,   "zSum"*idx);
+    eSum = read(MatFile,   "eSum"*idx);
+    HKL  = read(MatFile,    "HKL"*idx);
     return xBas, yBas, zBas, xGrd, yGrd, zSum, eSum, HKL;
 
   else
